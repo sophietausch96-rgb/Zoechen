@@ -5,18 +5,25 @@
     --surface: #121212;
     --text: #ffffff;
     --text-muted: #a1a1aa;
-    --grid-color: #000000; /* Schwarze Linien */
+    --grid-color: #000000;
     --success: #58c16c;
 }
 
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+/* Verhindert automatische Schriftvergrößerung auf Android */
+html { -webkit-text-size-adjust: 100%; }
+
+* { 
+    box-sizing: border-box; 
+    -webkit-tap-highlight-color: transparent;
+    margin: 0; padding: 0;
+}
 
 body {
-    margin: 0;
     font-family: -apple-system, system-ui, sans-serif;
     background-color: var(--bg-color);
     color: var(--text);
     height: 100vh;
+    width: 100vw;
     display: flex;
     justify-content: center;
     overflow: hidden;
@@ -24,105 +31,130 @@ body {
 
 .hidden { display: none !important; }
 
-/* Header & Call Button */
+/* FIX: Welcome Screen */
+#welcome-screen {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: var(--bg-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+h1 { font-size: 2.2rem; text-align: center; margin: 1.5rem 0; font-weight: 800; }
+.highlight { color: var(--primary); }
+p { color: var(--text-muted); margin-bottom: 2rem; }
+
+.btn-primary {
+    background-color: var(--primary);
+    color: white; border: none; padding: 1.2rem; margin: 0.5rem;
+    border-radius: 18px; font-size: 1.1rem; width: 80%; max-width: 300px;
+    font-weight: 700;
+}
+
+/* Game Screen */
+#game-screen {
+    width: 100%;
+    max-width: 450px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+}
+
 .header {
     width: 100%;
-    max-width: 400px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 15px 0 25px 0; /* Mehr Abstand nach unten zum Board */
-    padding: 0 10px;
+    margin-bottom: 15px;
 }
 
 .call-btn {
     background-color: var(--success);
-    color: white;
-    text-decoration: none;
-    padding: 12px 24px;
-    border-radius: 40px;
-    font-weight: 700;
-    font-size: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    color: white; text-decoration: none;
+    padding: 10px 20px; border-radius: 40px;
+    font-weight: 700; font-size: 0.95rem;
+    display: flex; align-items: center; gap: 8px;
     box-shadow: 0 4px 15px rgba(88, 193, 108, 0.4);
 }
 
 .icon-btn {
     background: var(--surface);
     border: 1px solid #333;
-    color: white;
-    padding: 10px;
-    border-radius: 12px;
+    color: white; padding: 10px; border-radius: 12px;
 }
 
-/* Sudoku Board - Exakt wie im Screenshot */
+/* Sudoku Board Fixes */
 #sudoku-board {
     display: grid;
     grid-template-columns: repeat(9, 1fr);
-    width: 94vw;
-    max-width: 380px;
-    aspect-ratio: 1;
-    background-color: var(--grid-color); /* Das sorgt für die schwarzen Linien */
-    border: 4px solid var(--grid-color);
-    gap: 1px; /* Dünne Linien zwischen allen Zellen */
-    border-radius: 12px;
+    width: 95vw;
+    max-width: 400px;
+    aspect-ratio: 1 / 1;
+    background-color: var(--grid-color);
+    border: 3px solid var(--grid-color);
+    gap: 1px;
+    border-radius: 8px;
     overflow: hidden;
 }
 
 .cell {
     background-color: var(--board-bg);
+    position: relative; /* Wichtig für Notizen */
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: clamp(1.2rem, 6vw, 1.7rem);
     color: #000000;
+    font-size: 1.5rem;
     cursor: pointer;
 }
 
-/* Dicke Linien für die 3x3 Blöcke */
-.cell:nth-child(3n):not(:nth-child(9n)) {
-    border-right: 3px solid var(--grid-color);
-}
+/* Dicke Linien für 3x3 Blöcke */
+.cell:nth-child(3n):not(:nth-child(9n)) { border-right: 3px solid var(--grid-color); }
 .cell:nth-child(n+19):nth-child(-n+27),
-.cell:nth-child(n+46):nth-child(-n+54) {
-    border-bottom: 3px solid var(--grid-color);
-}
+.cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 3px solid var(--grid-color); }
 
-.cell.initial { font-weight: 800; }
+.cell.initial { font-weight: 900; background-color: #f1f5f9; }
 .cell.selected { background-color: #bfdbfe; }
 .cell.highlighted { background-color: #dbeafe; }
 
-/* Welcome Screen */
-#welcome-screen {
-    position: fixed; inset: 0;
-    background-color: var(--bg-color);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    z-index: 2000;
+/* FIX: Bleistift Notizen klein halten */
+.note-grid {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    pointer-events: none;
 }
 
-.btn-primary {
-    background-color: var(--primary);
-    color: white; border: none; padding: 1.1rem; margin: 0.6rem;
-    border-radius: 18px; font-size: 1.1rem; width: 85%; font-weight: 700;
+.note-num {
+    font-size: 0.55rem !important; /* Sehr kleine Notizen */
+    line-height: 1;
+    color: #64748b;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-/* Controls & Numpad */
-.controls { display: flex; width: 100%; justify-content: space-evenly; margin: 20px 0; }
+/* Controls */
+.controls { display: flex; width: 100%; justify-content: space-evenly; margin: 15px 0; }
 .action-btn {
     background-color: var(--surface); border: 1px solid #333;
-    color: var(--text-muted); padding: 10px; border-radius: 14px;
-    width: 85px; font-size: 0.8rem;
+    color: var(--text-muted); padding: 8px; border-radius: 12px;
+    width: 80px; font-size: 0.75rem;
 }
 .action-btn.active { background-color: var(--primary); color: white; }
 
-.numpad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; width: 100%; padding: 0 10px; }
+/* Numpad */
+.numpad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: 100%; padding: 0 5px; }
 .numpad button {
     background-color: var(--surface); border: 1px solid #333;
-    border-radius: 14px; color: white; font-size: 1.5rem; padding: 15px 0;
+    border-radius: 12px; color: white; font-size: 1.4rem; padding: 12px 0;
 }
 .delete-btn { background-color: #450a0a !important; color: #f87171 !important; }
-
-#game-screen { width: 100%; max-width: 450px; display: flex; flex-direction: column; align-items: center; }
