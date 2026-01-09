@@ -4,6 +4,7 @@ let initialBoard = [];
 let selectedCell = null;
 let pencilMode = false;
 let notes = {};
+let currentDifficulty = 'medium';
 
 function initGrid() {
     const boardEl = document.getElementById('sudoku-board');
@@ -21,6 +22,7 @@ function initGrid() {
 }
 
 window.startGame = function(difficulty) {
+    currentDifficulty = difficulty;
     document.getElementById('welcome-screen').classList.add('hidden');
     document.getElementById('game-screen').classList.remove('hidden');
     generateGame(difficulty);
@@ -33,8 +35,7 @@ window.showWelcome = function() {
 };
 
 window.newGame = function() {
-    // Standardmäßig auf Medium, falls kein Status gespeichert
-    window.startGame('medium');
+    window.startGame(currentDifficulty);
 };
 
 function selectCell(r, c) {
@@ -138,7 +139,7 @@ function generateGame(difficulty) {
     };
     solve(grid);
     solvedBoard = JSON.parse(JSON.stringify(grid));
-    let holes = difficulty === 'easy' ? 30 : difficulty === 'medium' ? 45 : 55;
+    let holes = difficulty === 'easy' ? 32 : difficulty === 'medium' ? 46 : 56;
     while(holes > 0) {
         let r = Math.floor(Math.random()*9), c = Math.floor(Math.random()*9);
         if(grid[r][c]!==0) { grid[r][c]=0; holes--; }
