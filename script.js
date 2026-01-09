@@ -5,6 +5,7 @@ let selectedCell = null;
 let pencilMode = false;
 let notes = {};
 
+// Erzeugt das leere HTML Grid beim Start
 function initGrid() {
     const boardEl = document.getElementById('sudoku-board');
     if (!boardEl) return;
@@ -75,14 +76,21 @@ window.inputNumber = function(num) {
 };
 
 window.getHint = function() {
-    for (let r = 0; r < 9; r++) {
-        for (let c = 0; c < 9; c++) {
-            if (currentBoard[r][c] === 0) {
-                currentBoard[r][c] = solvedBoard[r][c];
-                renderBoard();
-                return;
+    if (!selectedCell) {
+        // Sucht das erste leere Feld
+        for (let r = 0; r < 9; r++) {
+            for (let c = 0; c < 9; c++) {
+                if (currentBoard[r][c] === 0) {
+                    currentBoard[r][c] = solvedBoard[r][c];
+                    renderBoard();
+                    return;
+                }
             }
         }
+    } else {
+        const { r, c } = selectedCell;
+        currentBoard[r][c] = solvedBoard[r][c];
+        renderBoard();
     }
 };
 
@@ -92,8 +100,11 @@ window.solveGame = function() {
 };
 
 function checkWin() {
-    const isWin = currentBoard.every((row, r) => row.every((val, c) => val === solvedBoard[r][c]));
-    if (isWin) setTimeout(() => alert("🎉 Sudoku gelöst!"), 200);
+    const isFull = currentBoard.every(row => row.every(cell => cell !== 0));
+    if (!isFull) return;
+
+    const isCorrect = currentBoard.every((row, r) => row.every((val, c) => val === solvedBoard[r][c]));
+    if (isCorrect) setTimeout(() => alert("🎉 Herzlichen Glückwunsch! Gelöst!"), 200);
 }
 
 function renderBoard() {
@@ -128,30 +139,13 @@ function renderBoard() {
     }
 }
 
-// Minimaler Sudoku Generator
+// Sudoku Logic
 function generateGame(difficulty) {
     let grid = Array(9).fill().map(() => Array(9).fill(0));
-    const solve = (g) => {
-        for (let r = 0; r < 9; r++) {
-            for (let c = 0; c < 9; c++) {
-                if (g[r][c] === 0) {
-                    let nums = [1,2,3,4,5,6,7,8,9].sort(() => Math.random() - 0.5);
-                    for (let n of nums) {
-                        if (isSafe(g, r, c, n)) {
-                            g[r][c] = n;
-                            if (solve(g)) return true;
-                            g[r][c] = 0;
-                        }
-                    }
-                    return false;
-                }
-            }
-        }
-        return true;
-    };
-    solve(grid);
+    fillSudoku(grid);
     solvedBoard = JSON.parse(JSON.stringify(grid));
-    let holes = difficulty === 'easy' ? 35 : difficulty === 'medium' ? 48 : 58;
+
+    let holes = difficulty === 'easy' ? 32 : difficulty === 'medium' ? 46 : 56;
     while(holes > 0) {
         let r = Math.floor(Math.random()*9), c = Math.floor(Math.random()*9);
         if(grid[r][c]!==0) { grid[r][c]=0; holes--; }
@@ -159,6 +153,25 @@ function generateGame(difficulty) {
     initialBoard = JSON.parse(JSON.stringify(grid));
     currentBoard = JSON.parse(JSON.stringify(grid));
     notes = {}; selectedCell = null;
+}
+
+function fillSudoku(g) {
+    for (let r = 0; r < 9; r++) {
+        for (let c = 0; c < 9; c++) {
+            if (g[r][c] === 0) {
+                let nums = [1,2,3,4,5,6,7,8,9].sort(() => Math.random() - 0.5);
+                for (let n of nums) {
+                    if (isSafe(g, r, c, n)) {
+                        g[r][c] = n;
+                        if (fillSudoku(g)) return true;
+                        g[r][c] = 0;
+                    }
+                }
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 function isSafe(g, r, c, n) {

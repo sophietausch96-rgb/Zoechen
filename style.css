@@ -1,11 +1,12 @@
 :root {
-    --bg-color: #0f172a; /* Tieferes Dunkelblau */
+    --bg-color: #000000; /* Reines Schwarz */
     --board-bg: #ffffff;
     --primary: #6366f1;  /* Modernes Indigo */
-    --text: #f8fafc;
-    --text-muted: #94a3b8;
+    --surface: #121212;  /* Dunkles Grau für Buttons */
+    --text: #ffffff;
+    --text-muted: #a1a1aa;
     --grid-line: #e2e8f0;
-    --grid-line-thick: #1e293b;
+    --grid-line-thick: #000000;
     --cell-select: #c7d2fe;
     --cell-same: #e0e7ff;
 }
@@ -14,7 +15,7 @@
 
 body {
     margin: 0;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background-color: var(--bg-color);
     color: var(--text);
     height: 100vh;
@@ -37,24 +38,26 @@ body {
     z-index: 100;
 }
 
-h1 { font-size: 2.2rem; text-align: center; margin: 1rem 0; line-height: 1.1; }
+h1 { font-size: 2.2rem; text-align: center; margin: 1.5rem 0; line-height: 1.1; font-weight: 800; }
 .highlight { color: var(--primary); }
-p { color: var(--text-muted); margin-bottom: 2rem; }
+p { color: var(--text-muted); margin-bottom: 2.5rem; letter-spacing: 0.5px; }
 
 .btn-primary {
     background-color: var(--primary);
     color: white;
     border: none;
-    padding: 1rem;
-    margin: 0.5rem;
-    border-radius: 16px;
+    padding: 1.1rem;
+    margin: 0.6rem;
+    border-radius: 18px;
     font-size: 1.1rem;
-    font-weight: 600;
-    width: 80%;
-    max-width: 280px;
+    font-weight: 700;
+    width: 85%;
+    max-width: 300px;
     cursor: pointer;
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    transition: transform 0.1s;
 }
+
+.btn-primary:active { transform: scale(0.96); }
 
 /* Game Screen */
 #game-screen {
@@ -71,22 +74,22 @@ p { color: var(--text-muted); margin-bottom: 2rem; }
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     padding: 0 10px;
 }
 
 .icon-btn {
-    background: #1e293b;
-    border: none;
+    background: var(--surface);
+    border: 1px solid #333;
     color: white;
     font-size: 1.5rem;
-    padding: 8px;
-    border-radius: 12px;
+    padding: 10px;
+    border-radius: 14px;
     display: flex;
     align-items: center;
 }
 
-/* Sudoku Board - RESPONSIVE */
+/* Sudoku Board */
 #sudoku-board {
     display: grid;
     grid-template-columns: repeat(9, 1fr);
@@ -95,8 +98,9 @@ p { color: var(--text-muted); margin-bottom: 2rem; }
     aspect-ratio: 1;
     background-color: var(--grid-line-thick);
     border: 3px solid var(--grid-line-thick);
-    border-radius: 8px;
+    border-radius: 12px;
     overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
 }
 
 .cell {
@@ -104,21 +108,22 @@ p { color: var(--text-muted); margin-bottom: 2rem; }
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: clamp(1rem, 5vw, 1.5rem);
-    color: #334155;
+    font-size: clamp(1.1rem, 5.5vw, 1.6rem);
+    color: #1e293b;
     cursor: pointer;
+    border: 0.1px solid var(--grid-line);
 }
 
 .cell.initial { font-weight: 800; color: #000; background-color: #f1f5f9; }
 .cell.selected { background-color: var(--cell-select); }
 .cell.highlighted { background-color: var(--cell-same); }
 
-/* Thick lines for 3x3 */
-.cell:nth-child(3n):not(:nth-child(9n)) { border-right: 2px solid var(--grid-line-thick); }
+/* Thick lines for 3x3 grids */
+.cell:nth-child(3n):not(:nth-child(9n)) { border-right: 2.5px solid var(--grid-line-thick); }
 .cell:nth-child(n+19):nth-child(-n+27),
-.cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid var(--grid-line-thick); }
+.cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2.5px solid var(--grid-line-thick); }
 
-/* Note Grid */
+/* Notes Grid */
 .note-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -126,11 +131,12 @@ p { color: var(--text-muted); margin-bottom: 2rem; }
     padding: 2px;
 }
 .note-num {
-    font-size: 0.5rem;
+    font-size: 0.55rem;
     color: #64748b;
     display: flex;
     justify-content: center;
     align-items: center;
+    line-height: 1;
 }
 
 /* Controls */
@@ -138,48 +144,48 @@ p { color: var(--text-muted); margin-bottom: 2rem; }
     display: flex;
     width: 100%;
     justify-content: space-evenly;
-    margin: 15px 0;
+    margin: 20px 0;
 }
 
 .action-btn {
-    background-color: #1e293b;
-    border: 1px solid #334155;
+    background-color: var(--surface);
+    border: 1px solid #333;
     color: var(--text-muted);
-    padding: 8px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    width: 75px;
+    padding: 10px;
+    border-radius: 14px;
+    font-size: 0.8rem;
+    width: 85px;
     transition: all 0.2s;
 }
 
-.action-btn i { font-size: 1.2rem; margin-bottom: 4px; }
+.action-btn i { font-size: 1.3rem; margin-bottom: 4px; display: inline-block; }
 .action-btn.active { background-color: var(--primary); color: white; border-color: var(--primary); }
 
 /* Numpad */
 .numpad {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
+    gap: 10px;
     width: 100%;
     padding: 0 5px;
 }
 
 .numpad button {
-    background-color: #1e293b;
-    border: none;
-    border-radius: 12px;
+    background-color: var(--surface);
+    border: 1px solid #333;
+    border-radius: 14px;
     color: white;
-    font-size: 1.3rem;
-    padding: 14px 0;
+    font-size: 1.5rem;
+    padding: 15px 0;
     font-weight: 600;
 }
 
-.numpad button:active { background-color: var(--primary); }
-.delete-btn { background-color: #450a0a !important; color: #f87171 !important; }
+.numpad button:active { background-color: var(--primary); transform: translateY(2px); }
+.delete-btn { background-color: #450a0a !important; border-color: #7f1d1d !important; color: #f87171 !important; }
 
-/* Small screen adjustments */
-@media (max-height: 600px) {
-    h1 { font-size: 1.5rem; }
-    .numpad button { padding: 8px 0; }
-    .controls { margin: 8px 0; }
+/* Responsive adjustments for very small phones */
+@media (max-height: 680px) {
+    h1 { font-size: 1.8rem; margin: 1rem 0; }
+    .numpad button { padding: 10px 0; font-size: 1.2rem; }
+    .controls { margin: 10px 0; }
 }
