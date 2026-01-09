@@ -23,8 +23,6 @@ function initGrid() {
 window.startGame = function(difficulty) {
     document.getElementById('welcome-screen').classList.add('hidden');
     document.getElementById('game-screen').classList.remove('hidden');
-    document.getElementById('difficulty-display').innerText = 
-        difficulty === 'easy' ? 'Leicht' : difficulty === 'medium' ? 'Mittel' : 'Schwer';
     generateGame(difficulty);
     renderBoard();
 };
@@ -35,9 +33,8 @@ window.showWelcome = function() {
 };
 
 window.newGame = function() {
-    let diff = document.getElementById('difficulty-display').innerText === 'Leicht' ? 'easy' : 
-               document.getElementById('difficulty-display').innerText === 'Mittel' ? 'medium' : 'hard';
-    window.startGame(diff);
+    // Standardmäßig auf Medium, falls kein Status gespeichert
+    window.startGame('medium');
 };
 
 function selectCell(r, c) {
