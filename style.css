@@ -1,0 +1,172 @@
+:root {
+    --bg-color: #1e293b;
+    --board-bg: #fff;
+    --primary: #3b82f6;
+    --text: #fff;
+    --text-muted: #94a3b8;
+    --grid-line: #cbd5e1;
+    --grid-line-thick: #475569;
+    --cell-select: #bfdbfe;
+    --cell-same: #e0f2fe;
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text);
+    height: 100vh;
+    overflow: hidden; /* Kein Scrollen */
+    display: flex;
+    justify-content: center;
+}
+
+.hidden { display: none !important; }
+
+/* Welcome Screen */
+#welcome-screen {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: var(--bg-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+h1 { font-size: 2.5rem; text-align: center; margin-bottom: 0.5rem; }
+.highlight { color: var(--primary); }
+p { color: var(--text-muted); margin-bottom: 2rem; }
+
+.btn-primary {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    padding: 15px 50px;
+    margin: 10px;
+    border-radius: 25px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    width: 200px;
+}
+
+/* Game Screen */
+#game-screen {
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+}
+
+.header {
+    width: 90%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+/* Sudoku Board */
+#sudoku-board {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    width: 95vw;
+    max-width: 400px;
+    aspect-ratio: 1;
+    background-color: var(--grid-line-thick);
+    border: 2px solid var(--grid-line-thick);
+    gap: 1px;
+}
+
+.cell {
+    background-color: var(--board-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #333;
+    position: relative;
+    cursor: pointer;
+}
+
+.cell.initial { font-weight: bold; color: #000; background-color: #f1f5f9; }
+.cell.selected { background-color: var(--cell-select); }
+.cell.highlighted { background-color: var(--cell-same); }
+.cell.error { color: red; }
+
+/* Dicke Linien für 3x3 Boxen */
+.cell:nth-child(3n) { border-right: 2px solid var(--grid-line-thick); }
+.cell:nth-child(9n) { border-right: none; }
+/* Unten simulieren wir durch Margin im Grid, hier vereinfacht durch Klassen im JS */
+.box-border-bottom { border-bottom: 2px solid var(--grid-line-thick); }
+
+/* Notizen (Bleistift) */
+.note-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    width: 100%; height: 100%;
+    pointer-events: none;
+}
+.note-num {
+    font-size: 8px;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Controls */
+.controls {
+    display: flex;
+    width: 90%;
+    justify-content: space-around;
+    margin: 20px 0;
+}
+
+.action-btn {
+    background-color: #334155;
+    border: none;
+    color: var(--text-muted);
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.action-btn.active {
+    background-color: var(--primary);
+    color: white;
+}
+
+/* Numpad */
+.numpad {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    width: 90%;
+}
+
+.numpad button {
+    background-color: var(--primary);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 1.5rem;
+    padding: 15px 0;
+    cursor: pointer;
+}
+
+.delete-btn { background-color: #ef4444 !important; }
