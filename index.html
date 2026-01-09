@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sodoku oder Podoku</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="welcome-screen">
+        <h1>Sodoku <br><span class="highlight">oder Podoku</span></h1>
+        <p>Wähle deine Schwierigkeit</p>
+        <button onclick="startGame('easy')" class="btn-primary">Leicht</button>
+        <button onclick="startGame('medium')" class="btn-primary">Mittel</button>
+        <button onclick="startGame('hard')" class="btn-primary">Schwer</button>
+    </div>
+
+    <div id="game-screen" class="hidden">
+        <div class="header">
+            <button onclick="showWelcome()" class="icon-btn">⬅</button>
+            <span id="difficulty-display">Mittel</span>
+            <button onclick="newGame()" class="icon-btn">↻</button>
+        </div>
+
+        <div id="sudoku-board">
+            </div>
+
+        <div class="controls">
+            <button id="btn-pencil" onclick="togglePencil()" class="action-btn">
+                ✏️ <br>Bleistift
+            </button>
+            <button onclick="getHint()" class="action-btn">
+                💡 <br>Tipp
+            </button>
+            <button onclick="solveGame()" class="action-btn">
+                ✅ <br>Auflösen
+            </button>
+        </div>
+
+        <div class="numpad">
+            <button onclick="inputNumber(1)">1</button>
+            <button onclick="inputNumber(2)">2</button>
+            <button onclick="inputNumber(3)">3</button>
+            <button onclick="inputNumber(4)">4</button>
+            <button onclick="inputNumber(5)">5</button>
+            <button onclick="inputNumber(6)">6</button>
+            <button onclick="inputNumber(7)">7</button>
+            <button onclick="inputNumber(8)">8</button>
+            <button onclick="inputNumber(9)">9</button>
+            <button onclick="inputNumber('X')" class="delete-btn">⌫</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
