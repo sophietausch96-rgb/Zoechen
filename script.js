@@ -1,176 +1,110 @@
-let currentBoard = [];
-let solvedBoard = [];
-let initialBoard = [];
-let selectedCell = null;
-let pencilMode = false;
-let notes = {};
-let currentDifficulty = 'medium';
+let currentBoard = [], solvedBoard = [], initialBoard = [], selectedCell = null, pencilMode = false, notes = {};
+let diff = 'medium';
 
 function initGrid() {
-    const boardEl = document.getElementById('sudoku-board');
-    if (!boardEl) return;
-    boardEl.innerHTML = '';
+    const b = document.getElementById('sudoku-board');
+    b.innerHTML = '';
     for (let r = 0; r < 9; r++) {
         for (let c = 0; c < 9; c++) {
-            let cell = document.createElement('div');
-            cell.id = `cell-${r}-${c}`;
-            cell.classList.add('cell');
-            cell.onclick = () => selectCell(r, c);
-            boardEl.appendChild(cell);
+            let div = document.createElement('div');
+            div.id = `cell-${r}-${c}`;
+            div.className = 'cell';
+            div.onclick = () => { selectedCell = {r, c}; render(); if(navigator.vibrate) navigator.vibrate(10); };
+            b.appendChild(div);
         }
     }
 }
 
-window.startGame = function(difficulty) {
-    vibrate(30);
-    currentDifficulty = difficulty;
+window.startGame = function(s) {
+    diff = s;
     document.getElementById('welcome-screen').classList.add('hidden');
     document.getElementById('game-screen').classList.remove('hidden');
-    generateGame(difficulty);
-    renderBoard();
+    generate(s); render();
 };
 
 window.showWelcome = function() {
-    vibrate(20);
     document.getElementById('welcome-screen').classList.remove('hidden');
     document.getElementById('game-screen').classList.add('hidden');
 };
 
-window.newGame = function() {
-    vibrate(40);
-    window.startGame(currentDifficulty);
-};
-
-function selectCell(r, c) {
-    vibrate(10);
-    selectedCell = { r, c };
-    renderBoard();
-}
+window.newGame = function() { generate(diff); render(); };
 
 window.togglePencil = function() {
-    vibrate(20);
     pencilMode = !pencilMode;
     document.getElementById('btn-pencil').classList.toggle('active', pencilMode);
 };
 
-window.inputNumber = function(num) {
-    if (!selectedCell) return;
-    vibrate(15);
-    const { r, c } = selectedCell;
-    if (initialBoard[r][c] !== 0) return;
-
-    if (num === 'X') {
+window.inputNumber = function(n) {
+    if(!selectedCell) return;
+    const {r, c} = selectedCell;
+    if(initialBoard[r][c] !== 0) return;
+    if(n === 'X') { currentBoard[r][c] = 0; delete notes[`${r}-${c}`]; }
+    else if(pencilMode) {
+        let k = `${r}-${c}`; if(!notes[k]) notes[k] = [];
+        notes[k] = notes[k].includes(n) ? notes[k].filter(x => x!==n) : [...notes[k], n];
         currentBoard[r][c] = 0;
-        delete notes[`${r}-${c}`];
-    } else {
-        if (pencilMode) {
-            let key = `${r}-${c}`;
-            if (!notes[key]) notes[key] = [];
-            notes[key] = notes[key].includes(num) ? notes[key].filter(n => n !== num) : [...notes[key], num];
-            currentBoard[r][c] = 0; 
-        } else {
-            currentBoard[r][c] = num;
-            delete notes[`${r}-${c}`];
-        }
-    }
-    renderBoard();
-    checkWin();
+    } else { currentBoard[r][c] = n; delete notes[`${r}-${c}`]; }
+    render(); checkWin();
 };
 
 window.getHint = function() {
-    vibrate(50);
-    if (selectedCell) {
-        currentBoard[selectedCell.r][selectedCell.c] = solvedBoard[selectedCell.r][selectedCell.c];
-    }
-    renderBoard();
+    if(selectedCell) currentBoard[selectedCell.r][selectedCell.c] = solvedBoard[selectedCell.r][selectedCell.c];
+    render();
 };
 
-window.solveGame = function() {
-    vibrate(100);
-    currentBoard = JSON.parse(JSON.stringify(solvedBoard));
-    renderBoard();
-};
+window.solveGame = function() { currentBoard = JSON.parse(JSON.stringify(solvedBoard)); render(); };
 
-function renderBoard() {
-    for (let r = 0; r < 9; r++) {
-        for (let c = 0; c < 9; c++) {
-            const cell = document.getElementById(`cell-${r}-${c}`);
-            const val = currentBoard[r][c];
-            const isInit = initialBoard[r][c] !== 0;
-            
-            cell.className = 'cell' + (isInit ? ' initial' : '') + 
-                (selectedCell?.r === r && selectedCell?.c === c ? ' selected' : '');
-            
-            cell.innerHTML = ''; 
-            
-            if (val !== 0) {
-                cell.textContent = val;
-                if (selectedCell && currentBoard[selectedCell.r][selectedCell.c] === val) {
-                    cell.classList.add('highlighted');
+function render() {
+    for(let r=0; r<9; r++) {
+        for(let c=0; c<9; c++) {
+            let el = document.getElementById(`cell-${r}-${c}`);
+            let val = currentBoard[r][c];
+            el.className = `cell ${initialBoard[r][c]!==0?'initial':''} ${selectedCell?.r===r && selectedCell?.c===c?'selected':''}`;
+            el.innerHTML = '';
+            if(val !== 0) el.textContent = val;
+            else if(notes[`${r}-${c}`]) {
+                let g = document.createElement('div'); g.className = 'note-grid';
+                for(let i=1; i<=9; i++) {
+                    let s = document.createElement('span'); s.className = 'note-num';
+                    s.textContent = notes[`${r}-${c}`].includes(i) ? i : '';
+                    g.appendChild(s);
                 }
-            } else {
-                const cn = notes[`${r}-${c}`];
-                if (cn && cn.length > 0) {
-                    const grid = document.createElement('div');
-                    grid.className = 'note-grid';
-                    for (let i = 1; i <= 9; i++) {
-                        const s = document.createElement('span');
-                        s.className = 'note-num';
-                        s.textContent = cn.includes(i) ? i : '';
-                        grid.appendChild(s);
-                    }
-                    cell.appendChild(grid);
-                }
+                el.appendChild(g);
             }
         }
     }
 }
 
-function generateGame(difficulty) {
-    let grid = Array(9).fill().map(() => Array(9).fill(0));
-    const solve = (g) => {
-        for (let r = 0; r < 9; r++) {
-            for (let c = 0; c < 9; c++) {
-                if (g[r][c] === 0) {
-                    let nums = [1,2,3,4,5,6,7,8,9].sort(() => Math.random() - 0.5);
-                    for (let n of nums) {
-                        if (isSafe(g, r, c, n)) {
-                            g[r][c] = n;
-                            if (solve(g)) return true;
-                            g[r][c] = 0;
-                        }
+function generate(s) {
+    let g = Array(9).fill().map(() => Array(9).fill(0));
+    const solve = (b) => {
+        for(let r=0; r<9; r++) {
+            for(let c=0; c<9; c++) {
+                if(b[r][c]===0) {
+                    let nums = [1,2,3,4,5,6,7,8,9].sort(()=>Math.random()-0.5);
+                    for(let n of nums) {
+                        if(isSafe(b,r,c,n)) { b[r][c]=n; if(solve(b)) return true; b[r][c]=0; }
                     } return false;
                 }
             }
         } return true;
     };
-    solve(grid);
-    solvedBoard = JSON.parse(JSON.stringify(grid));
-    let holes = difficulty === 'easy' ? 30 : difficulty === 'medium' ? 45 : 55;
-    while(holes > 0) {
-        let r = Math.floor(Math.random()*9), c = Math.floor(Math.random()*9);
-        if(grid[r][c]!==0) { grid[r][c]=0; holes--; }
-    }
-    initialBoard = JSON.parse(JSON.stringify(grid));
-    currentBoard = JSON.parse(JSON.stringify(grid));
-    notes = {}; selectedCell = null;
+    solve(g); solvedBoard = JSON.parse(JSON.stringify(g));
+    let h = s==='easy'?30:s==='medium'?45:55;
+    while(h>0) { let r=Math.floor(Math.random()*9), c=Math.floor(Math.random()*9); if(g[r][c]!==0){g[r][c]=0; h--;} }
+    initialBoard = JSON.parse(JSON.stringify(g)); currentBoard = JSON.parse(JSON.stringify(g));
+    notes = {};
 }
 
-function isSafe(g, r, c, n) {
-    for(let i=0; i<9; i++) if(g[r][i]===n || g[i][c]===n) return false;
+function isSafe(b,r,c,n) {
+    for(let i=0; i<9; i++) if(b[r][i]===n || b[i][c]===n) return false;
     let rs=r-r%3, cs=c-c%3;
-    for(let i=0; i<3; i++) for(let j=0; j<3; j++) if(g[rs+i][cs+j]===n) return false;
+    for(let i=0; i<3; i++) for(let j=0; j<3; j++) if(b[rs+i][cs+j]===n) return false;
     return true;
 }
 
 function checkWin() {
-    if (currentBoard.every((row, r) => row.every((v, c) => v === solvedBoard[r][c]))) {
-        setTimeout(() => alert("Herzlichen Glückwunsch! Gelöst!"), 200);
-    }
-}
-
-function vibrate(ms) {
-    if (navigator.vibrate) navigator.vibrate(ms);
+    if(currentBoard.flat().join('') === solvedBoard.flat().join('')) setTimeout(()=>alert("Gewonnen!"), 300);
 }
 
 document.addEventListener('DOMContentLoaded', initGrid);

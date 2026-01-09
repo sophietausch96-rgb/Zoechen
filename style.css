@@ -1,29 +1,11 @@
-:root {
-    --bg-color: #000000;
-    --board-bg: #ffffff;
-    --primary: #6366f1;
-    --surface: #121212;
-    --text: #ffffff;
-    --text-muted: #a1a1aa;
-    --grid-color: #000000;
-    --success: #58c16c;
-}
-
-/* Verhindert automatische Schriftvergrößerung auf Android */
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html { -webkit-text-size-adjust: 100%; }
 
-* { 
-    box-sizing: border-box; 
-    -webkit-tap-highlight-color: transparent;
-    margin: 0; padding: 0;
-}
-
 body {
-    font-family: -apple-system, system-ui, sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text);
+    background-color: #000;
+    color: #fff;
+    font-family: sans-serif;
     height: 100vh;
-    width: 100vw;
     display: flex;
     justify-content: center;
     overflow: hidden;
@@ -31,130 +13,65 @@ body {
 
 .hidden { display: none !important; }
 
-/* FIX: Welcome Screen */
+/* Willkommen */
 #welcome-screen {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background-color: var(--bg-color);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
+    position: fixed; inset: 0; background: #000;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100;
 }
-
-h1 { font-size: 2.2rem; text-align: center; margin: 1.5rem 0; font-weight: 800; }
-.highlight { color: var(--primary); }
-p { color: var(--text-muted); margin-bottom: 2rem; }
-
 .btn-primary {
-    background-color: var(--primary);
-    color: white; border: none; padding: 1.2rem; margin: 0.5rem;
-    border-radius: 18px; font-size: 1.1rem; width: 80%; max-width: 300px;
-    font-weight: 700;
+    background: #6366f1; color: white; border: none; padding: 15px;
+    margin: 5px; border-radius: 12px; width: 80%; font-weight: bold; font-size: 1.1rem;
 }
 
-/* Game Screen */
-#game-screen {
-    width: 100%;
-    max-width: 450px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 10px;
-}
+/* Header */
+#game-screen { width: 100%; max-width: 400px; display: flex; flex-direction: column; align-items: center; padding: 10px; }
+.header { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.call-btn { background: #58c16c; color: white; text-decoration: none; padding: 10px 15px; border-radius: 30px; font-weight: bold; font-size: 0.9rem; display: flex; gap: 8px; }
+.icon-btn { background: #121212; border: 1px solid #333; color: white; padding: 8px; border-radius: 10px; }
 
-.header {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-.call-btn {
-    background-color: var(--success);
-    color: white; text-decoration: none;
-    padding: 10px 20px; border-radius: 40px;
-    font-weight: 700; font-size: 0.95rem;
-    display: flex; align-items: center; gap: 8px;
-    box-shadow: 0 4px 15px rgba(88, 193, 108, 0.4);
-}
-
-.icon-btn {
-    background: var(--surface);
-    border: 1px solid #333;
-    color: white; padding: 10px; border-radius: 12px;
-}
-
-/* Sudoku Board Fixes */
+/* Das Gitter (Outlines) */
 #sudoku-board {
     display: grid;
     grid-template-columns: repeat(9, 1fr);
-    width: 95vw;
-    max-width: 400px;
-    aspect-ratio: 1 / 1;
-    background-color: var(--grid-color);
-    border: 3px solid var(--grid-color);
+    width: 95vw; max-width: 380px; aspect-ratio: 1;
+    background: #000; /* Schwarze Linien */
+    border: 2px solid #000;
     gap: 1px;
-    border-radius: 8px;
-    overflow: hidden;
 }
 
 .cell {
-    background-color: var(--board-bg);
-    position: relative; /* Wichtig für Notizen */
+    background: #fff;
+    color: #000;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #000000;
     font-size: 1.5rem;
-    cursor: pointer;
+    position: relative;
 }
 
-/* Dicke Linien für 3x3 Blöcke */
-.cell:nth-child(3n):not(:nth-child(9n)) { border-right: 3px solid var(--grid-color); }
+/* Dicke Trennlinien */
+.cell:nth-child(3n):not(:nth-child(9n)) { border-right: 3px solid #000; }
 .cell:nth-child(n+19):nth-child(-n+27),
-.cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 3px solid var(--grid-color); }
+.cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 3px solid #000; }
 
-.cell.initial { font-weight: 900; background-color: #f1f5f9; }
-.cell.selected { background-color: #bfdbfe; }
-.cell.highlighted { background-color: #dbeafe; }
+.cell.initial { font-weight: 900; background: #f0f0f0; }
+.cell.selected { background: #bfdbfe; }
 
-/* FIX: Bleistift Notizen klein halten */
+/* Notizen Fix */
 .note-grid {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
+    position: absolute; inset: 0;
+    display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
     pointer-events: none;
 }
-
 .note-num {
-    font-size: 0.55rem !important; /* Sehr kleine Notizen */
-    line-height: 1;
-    color: #64748b;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    font-size: 0.5rem !important; line-height: 1; color: #666;
+    display: flex; align-items: center; justify-content: center;
 }
 
-/* Controls */
+/* Controls & Numpad */
 .controls { display: flex; width: 100%; justify-content: space-evenly; margin: 15px 0; }
-.action-btn {
-    background-color: var(--surface); border: 1px solid #333;
-    color: var(--text-muted); padding: 8px; border-radius: 12px;
-    width: 80px; font-size: 0.75rem;
-}
-.action-btn.active { background-color: var(--primary); color: white; }
+.action-btn { background: #121212; border: 1px solid #333; color: #a1a1aa; padding: 8px; border-radius: 10px; width: 80px; font-size: 0.7rem; }
+.action-btn.active { background: #6366f1; color: white; }
 
-/* Numpad */
-.numpad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: 100%; padding: 0 5px; }
-.numpad button {
-    background-color: var(--surface); border: 1px solid #333;
-    border-radius: 12px; color: white; font-size: 1.4rem; padding: 12px 0;
-}
-.delete-btn { background-color: #450a0a !important; color: #f87171 !important; }
+.numpad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: 100%; }
+.numpad button { background: #121212; border: 1px solid #333; color: white; padding: 12px 0; border-radius: 10px; font-size: 1.3rem; }
