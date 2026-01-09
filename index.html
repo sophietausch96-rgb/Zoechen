@@ -3,21 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sudoku Modern Dark</title>
+    <title>Sudoku Premium</title>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div id="welcome-screen">
-        <div class="logo-area">
-            <i class="ph ph-grid-nine"></i>
-        </div>
-        <h1>Sudoku<br><span>Premium</span></h1>
-        <div class="menu">
-            <button onclick="startGame('easy')" class="btn-menu">Leicht</button>
-            <button onclick="startGame('medium')" class="btn-menu">Mittel</button>
-            <button onclick="startGame('hard')" class="btn-menu">Schwer</button>
+        <div class="welcome-content">
+            <i class="ph ph-grid-nine logo-icon"></i>
+            <h1>Sodoku<br><span class="accent-text">oder Podoku</span></h1>
+            <p class="subtitle">Wähle deine Schwierigkeit</p>
+            
+            <div class="button-group">
+                <button onclick="startGame('easy')" class="btn-premium">Leicht</button>
+                <button onclick="startGame('medium')" class="btn-premium">Mittel</button>
+                <button onclick="startGame('hard')" class="btn-premium">Schwer</button>
+            </div>
         </div>
     </div>
 
