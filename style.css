@@ -1,12 +1,11 @@
 :root {
-    --bg-color: #000000; /* Reines Schwarz */
+    --bg-color: #000000;
     --board-bg: #ffffff;
-    --primary: #6366f1;  /* Modernes Indigo */
-    --surface: #121212;  /* Dunkles Grau für Buttons */
+    --primary: #6366f1;
+    --surface: #121212;
     --text: #ffffff;
     --text-muted: #a1a1aa;
-    --grid-line: #e2e8f0;
-    --grid-line-thick: #000000;
+    --grid-outline: #1e293b; /* Farbe der Linien */
     --cell-select: #c7d2fe;
     --cell-same: #e0e7ff;
 }
@@ -15,7 +14,7 @@
 
 body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: -apple-system, system-ui, sans-serif;
     background-color: var(--bg-color);
     color: var(--text);
     height: 100vh;
@@ -25,6 +24,22 @@ body {
 }
 
 .hidden { display: none !important; }
+
+/* Call Button */
+.top-bar { width: 100%; display: flex; justify-content: center; padding: 10px 0; }
+.call-btn {
+    background-color: #22c55e;
+    color: white;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+}
 
 /* Welcome Screen */
 #welcome-screen {
@@ -38,10 +53,8 @@ body {
     z-index: 100;
 }
 
-h1 { font-size: 2.2rem; text-align: center; margin: 1.5rem 0; line-height: 1.1; font-weight: 800; }
+h1 { font-size: 2.2rem; text-align: center; margin: 1.5rem 0; font-weight: 800; }
 .highlight { color: var(--primary); }
-p { color: var(--text-muted); margin-bottom: 2.5rem; letter-spacing: 0.5px; }
-
 .btn-primary {
     background-color: var(--primary);
     color: white;
@@ -50,14 +63,10 @@ p { color: var(--text-muted); margin-bottom: 2.5rem; letter-spacing: 0.5px; }
     margin: 0.6rem;
     border-radius: 18px;
     font-size: 1.1rem;
-    font-weight: 700;
     width: 85%;
     max-width: 300px;
-    cursor: pointer;
-    transition: transform 0.1s;
+    font-weight: 700;
 }
-
-.btn-primary:active { transform: scale(0.96); }
 
 /* Game Screen */
 #game-screen {
@@ -66,7 +75,7 @@ p { color: var(--text-muted); margin-bottom: 2.5rem; letter-spacing: 0.5px; }
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 10px;
+    padding: 5px 10px;
 }
 
 .header {
@@ -74,33 +83,27 @@ p { color: var(--text-muted); margin-bottom: 2.5rem; letter-spacing: 0.5px; }
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    padding: 0 10px;
+    margin-bottom: 10px;
 }
 
 .icon-btn {
     background: var(--surface);
     border: 1px solid #333;
     color: white;
-    font-size: 1.5rem;
     padding: 10px;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
+    border-radius: 12px;
 }
 
-/* Sudoku Board */
+/* Sudoku Board mit festen Outlines */
 #sudoku-board {
     display: grid;
     grid-template-columns: repeat(9, 1fr);
     width: 98vw;
     max-width: 400px;
     aspect-ratio: 1;
-    background-color: var(--grid-line-thick);
-    border: 3px solid var(--grid-line-thick);
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    background-color: var(--grid-outline);
+    border: 2px solid var(--grid-outline);
+    gap: 1px; /* Erzeugt die dünnen Linien */
 }
 
 .cell {
@@ -108,84 +111,40 @@ p { color: var(--text-muted); margin-bottom: 2.5rem; letter-spacing: 0.5px; }
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: clamp(1.1rem, 5.5vw, 1.6rem);
+    font-size: clamp(1.1rem, 5.5vw, 1.5rem);
     color: #1e293b;
     cursor: pointer;
-    border: 0.1px solid var(--grid-line);
 }
 
-.cell.initial { font-weight: 800; color: #000; background-color: #f1f5f9; }
+/* Dicke Linien Outlines für 3x3 Boxen */
+.cell:nth-child(3n):not(:nth-child(9n)) { border-right: 2px solid var(--grid-outline); }
+.cell:nth-child(n+19):nth-child(-n+27),
+.cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid var(--grid-outline); }
+
+.cell.initial { font-weight: 800; color: #000; background-color: #f8fafc; }
 .cell.selected { background-color: var(--cell-select); }
 .cell.highlighted { background-color: var(--cell-same); }
 
-/* Thick lines for 3x3 grids */
-.cell:nth-child(3n):not(:nth-child(9n)) { border-right: 2.5px solid var(--grid-line-thick); }
-.cell:nth-child(n+19):nth-child(-n+27),
-.cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2.5px solid var(--grid-line-thick); }
-
-/* Notes Grid */
-.note-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    width: 100%; height: 100%;
-    padding: 2px;
-}
-.note-num {
-    font-size: 0.55rem;
-    color: #64748b;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    line-height: 1;
-}
-
-/* Controls */
-.controls {
-    display: flex;
-    width: 100%;
-    justify-content: space-evenly;
-    margin: 20px 0;
-}
-
+/* Controls & Numpad */
+.controls { display: flex; width: 100%; justify-content: space-evenly; margin: 15px 0; }
 .action-btn {
     background-color: var(--surface);
     border: 1px solid #333;
     color: var(--text-muted);
-    padding: 10px;
-    border-radius: 14px;
-    font-size: 0.8rem;
-    width: 85px;
-    transition: all 0.2s;
+    padding: 8px;
+    border-radius: 12px;
+    width: 80px;
+    font-size: 0.75rem;
 }
+.action-btn.active { background-color: var(--primary); color: white; }
 
-.action-btn i { font-size: 1.3rem; margin-bottom: 4px; display: inline-block; }
-.action-btn.active { background-color: var(--primary); color: white; border-color: var(--primary); }
-
-/* Numpad */
-.numpad {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
-    width: 100%;
-    padding: 0 5px;
-}
-
+.numpad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: 100%; }
 .numpad button {
     background-color: var(--surface);
     border: 1px solid #333;
-    border-radius: 14px;
+    border-radius: 12px;
     color: white;
-    font-size: 1.5rem;
-    padding: 15px 0;
-    font-weight: 600;
+    font-size: 1.4rem;
+    padding: 12px 0;
 }
-
-.numpad button:active { background-color: var(--primary); transform: translateY(2px); }
-.delete-btn { background-color: #450a0a !important; border-color: #7f1d1d !important; color: #f87171 !important; }
-
-/* Responsive adjustments for very small phones */
-@media (max-height: 680px) {
-    h1 { font-size: 1.8rem; margin: 1rem 0; }
-    .numpad button { padding: 10px 0; font-size: 1.2rem; }
-    .controls { margin: 10px 0; }
-}
+.delete-btn { background-color: #450a0a !important; color: #f87171 !important; }

@@ -5,12 +5,10 @@ let selectedCell = null;
 let pencilMode = false;
 let notes = {};
 
-// Erzeugt das leere HTML Grid beim Start
 function initGrid() {
     const boardEl = document.getElementById('sudoku-board');
     if (!boardEl) return;
     boardEl.innerHTML = '';
-    
     for (let r = 0; r < 9; r++) {
         for (let c = 0; c < 9; c++) {
             let cell = document.createElement('div');
@@ -25,8 +23,8 @@ function initGrid() {
 window.startGame = function(difficulty) {
     document.getElementById('welcome-screen').classList.add('hidden');
     document.getElementById('game-screen').classList.remove('hidden');
-    let diffName = difficulty === 'easy' ? 'Leicht' : difficulty === 'medium' ? 'Mittel' : 'Schwer';
-    document.getElementById('difficulty-display').innerText = diffName;
+    document.getElementById('difficulty-display').innerText = 
+        difficulty === 'easy' ? 'Leicht' : difficulty === 'medium' ? 'Mittel' : 'Schwer';
     generateGame(difficulty);
     renderBoard();
 };
@@ -37,8 +35,8 @@ window.showWelcome = function() {
 };
 
 window.newGame = function() {
-    let diffText = document.getElementById('difficulty-display').innerText;
-    let diff = diffText === 'Leicht' ? 'easy' : diffText === 'Mittel' ? 'medium' : 'hard';
+    let diff = document.getElementById('difficulty-display').innerText === 'Leicht' ? 'easy' : 
+               document.getElementById('difficulty-display').innerText === 'Mittel' ? 'medium' : 'hard';
     window.startGame(diff);
 };
 
@@ -76,22 +74,19 @@ window.inputNumber = function(num) {
 };
 
 window.getHint = function() {
-    if (!selectedCell) {
-        // Sucht das erste leere Feld
+    if (selectedCell) {
+        currentBoard[selectedCell.r][selectedCell.c] = solvedBoard[selectedCell.r][selectedCell.c];
+    } else {
         for (let r = 0; r < 9; r++) {
             for (let c = 0; c < 9; c++) {
                 if (currentBoard[r][c] === 0) {
                     currentBoard[r][c] = solvedBoard[r][c];
-                    renderBoard();
-                    return;
+                    renderBoard(); return;
                 }
             }
         }
-    } else {
-        const { r, c } = selectedCell;
-        currentBoard[r][c] = solvedBoard[r][c];
-        renderBoard();
     }
+    renderBoard();
 };
 
 window.solveGame = function() {
@@ -99,53 +94,54 @@ window.solveGame = function() {
     renderBoard();
 };
 
-function checkWin() {
-    const isFull = currentBoard.every(row => row.every(cell => cell !== 0));
-    if (!isFull) return;
-
-    const isCorrect = currentBoard.every((row, r) => row.every((val, c) => val === solvedBoard[r][c]));
-    if (isCorrect) setTimeout(() => alert("🎉 Herzlichen Glückwunsch! Gelöst!"), 200);
-}
-
 function renderBoard() {
     for (let r = 0; r < 9; r++) {
         for (let c = 0; c < 9; c++) {
             const cell = document.getElementById(`cell-${r}-${c}`);
             const val = currentBoard[r][c];
             const isInit = initialBoard[r][c] !== 0;
-            
             cell.className = 'cell' + (isInit ? ' initial' : '') + 
                 (selectedCell?.r === r && selectedCell?.c === c ? ' selected' : '');
-            
             cell.innerHTML = '';
             if (val !== 0) {
                 cell.textContent = val;
                 if (selectedCell && currentBoard[selectedCell.r][selectedCell.c] === val) cell.classList.add('highlighted');
             } else {
-                const cellNotes = notes[`${r}-${c}`];
-                if (cellNotes?.length) {
-                    const container = document.createElement('div');
-                    container.className = 'note-grid';
+                const cn = notes[`${r}-${c}`];
+                if (cn?.length) {
+                    const g = document.createElement('div'); g.className = 'note-grid';
                     for (let i = 1; i <= 9; i++) {
-                        const s = document.createElement('span');
-                        s.className = 'note-num';
-                        s.textContent = cellNotes.includes(i) ? i : '';
-                        container.appendChild(s);
+                        const s = document.createElement('span'); s.className = 'note-num';
+                        s.textContent = cn.includes(i) ? i : ''; g.appendChild(s);
                     }
-                    cell.appendChild(container);
+                    cell.appendChild(g);
                 }
             }
         }
     }
 }
 
-// Sudoku Logic
 function generateGame(difficulty) {
     let grid = Array(9).fill().map(() => Array(9).fill(0));
-    fillSudoku(grid);
+    const solve = (g) => {
+        for (let r = 0; r < 9; r++) {
+            for (let c = 0; c < 9; c++) {
+                if (g[r][c] === 0) {
+                    let nums = [1,2,3,4,5,6,7,8,9].sort(() => Math.random() - 0.5);
+                    for (let n of nums) {
+                        if (isSafe(g, r, c, n)) {
+                            g[r][c] = n;
+                            if (solve(g)) return true;
+                            g[r][c] = 0;
+                        }
+                    } return false;
+                }
+            }
+        } return true;
+    };
+    solve(grid);
     solvedBoard = JSON.parse(JSON.stringify(grid));
-
-    let holes = difficulty === 'easy' ? 32 : difficulty === 'medium' ? 46 : 56;
+    let holes = difficulty === 'easy' ? 30 : difficulty === 'medium' ? 45 : 55;
     while(holes > 0) {
         let r = Math.floor(Math.random()*9), c = Math.floor(Math.random()*9);
         if(grid[r][c]!==0) { grid[r][c]=0; holes--; }
@@ -155,30 +151,17 @@ function generateGame(difficulty) {
     notes = {}; selectedCell = null;
 }
 
-function fillSudoku(g) {
-    for (let r = 0; r < 9; r++) {
-        for (let c = 0; c < 9; c++) {
-            if (g[r][c] === 0) {
-                let nums = [1,2,3,4,5,6,7,8,9].sort(() => Math.random() - 0.5);
-                for (let n of nums) {
-                    if (isSafe(g, r, c, n)) {
-                        g[r][c] = n;
-                        if (fillSudoku(g)) return true;
-                        g[r][c] = 0;
-                    }
-                }
-                return false;
-            }
-        }
-    }
-    return true;
-}
-
 function isSafe(g, r, c, n) {
     for(let i=0; i<9; i++) if(g[r][i]===n || g[i][c]===n) return false;
     let rs=r-r%3, cs=c-c%3;
     for(let i=0; i<3; i++) for(let j=0; j<3; j++) if(g[rs+i][cs+j]===n) return false;
     return true;
+}
+
+function checkWin() {
+    if (currentBoard.every((row, r) => row.every((v, c) => v === solvedBoard[r][c]))) {
+        setTimeout(() => alert("Gewonnen!"), 200);
+    }
 }
 
 document.addEventListener('DOMContentLoaded', initGrid);
