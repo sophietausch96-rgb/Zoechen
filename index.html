@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sodoku oder Podoku</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div id="welcome-screen">
+        <i class="ph ph-grid-nine highlight" style="font-size: 4rem;"></i>
         <h1>Sodoku <br><span class="highlight">oder Podoku</span></h1>
         <p>Wähle deine Schwierigkeit</p>
         <button onclick="startGame('easy')" class="btn-primary">Leicht</button>
@@ -18,9 +20,9 @@
 
     <div id="game-screen" class="hidden">
         <div class="header">
-            <button onclick="showWelcome()" class="icon-btn">⬅</button>
+            <button onclick="showWelcome()" class="icon-btn"><i class="ph ph-caret-left"></i></button>
             <span id="difficulty-display">Mittel</span>
-            <button onclick="newGame()" class="icon-btn">↻</button>
+            <button onclick="newGame()" class="icon-btn"><i class="ph ph-arrows-clockwise"></i></button>
         </div>
 
         <div id="sudoku-board">
@@ -28,13 +30,13 @@
 
         <div class="controls">
             <button id="btn-pencil" onclick="togglePencil()" class="action-btn">
-                ✏️ <br>Bleistift
+                <i class="ph ph-pencil-line"></i><br>Notiz
             </button>
             <button onclick="getHint()" class="action-btn">
-                💡 <br>Tipp
+                <i class="ph ph-lightbulb"></i><br>Tipp
             </button>
             <button onclick="solveGame()" class="action-btn">
-                ✅ <br>Auflösen
+                <i class="ph ph-magic-wand"></i><br>Lösen
             </button>
         </div>
 
@@ -48,7 +50,7 @@
             <button onclick="inputNumber(7)">7</button>
             <button onclick="inputNumber(8)">8</button>
             <button onclick="inputNumber(9)">9</button>
-            <button onclick="inputNumber('X')" class="delete-btn">⌫</button>
+            <button onclick="inputNumber('X')" class="delete-btn"><i class="ph ph-backspace"></i></button>
         </div>
     </div>
 

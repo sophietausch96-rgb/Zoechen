@@ -3,11 +3,11 @@ let solvedBoard = [];
 let initialBoard = [];
 let selectedCell = null;
 let pencilMode = false;
-let notes = {}; // Key: "row-col", Value: Array of numbers
+let notes = {};
 
-// Initialisierung
 function initGrid() {
     const boardEl = document.getElementById('sudoku-board');
+    if (!boardEl) return;
     boardEl.innerHTML = '';
     
     for (let r = 0; r < 9; r++) {
@@ -15,88 +15,66 @@ function initGrid() {
             let cell = document.createElement('div');
             cell.id = `cell-${r}-${c}`;
             cell.classList.add('cell');
-            
-            // Visuelle Trennung (3x3 Boxen)
-            if ((c + 1) % 3 === 0 && c !== 8) cell.style.borderRight = "2px solid #475569";
-            if ((r + 1) % 3 === 0 && r !== 8) cell.style.borderBottom = "2px solid #475569";
-
             cell.onclick = () => selectCell(r, c);
             boardEl.appendChild(cell);
         }
     }
 }
 
-function startGame(difficulty) {
+window.startGame = function(difficulty) {
     document.getElementById('welcome-screen').classList.add('hidden');
     document.getElementById('game-screen').classList.remove('hidden');
-    
     let diffName = difficulty === 'easy' ? 'Leicht' : difficulty === 'medium' ? 'Mittel' : 'Schwer';
     document.getElementById('difficulty-display').innerText = diffName;
-
     generateGame(difficulty);
     renderBoard();
-}
+};
 
-function showWelcome() {
+window.showWelcome = function() {
     document.getElementById('welcome-screen').classList.remove('hidden');
     document.getElementById('game-screen').classList.add('hidden');
-}
+};
 
-function newGame() {
+window.newGame = function() {
     let diffText = document.getElementById('difficulty-display').innerText;
     let diff = diffText === 'Leicht' ? 'easy' : diffText === 'Mittel' ? 'medium' : 'hard';
-    startGame(diff);
-}
+    window.startGame(diff);
+};
 
 function selectCell(r, c) {
     selectedCell = { r, c };
     renderBoard();
 }
 
-function togglePencil() {
+window.togglePencil = function() {
     pencilMode = !pencilMode;
-    const btn = document.getElementById('btn-pencil');
-    if (pencilMode) btn.classList.add('active');
-    else btn.classList.remove('active');
-}
+    document.getElementById('btn-pencil').classList.toggle('active', pencilMode);
+};
 
-function inputNumber(num) {
+window.inputNumber = function(num) {
     if (!selectedCell) return;
     const { r, c } = selectedCell;
-
-    // Feste Zahlen nicht ändern
     if (initialBoard[r][c] !== 0) return;
 
     if (num === 'X') {
-        // Löschen
         currentBoard[r][c] = 0;
         delete notes[`${r}-${c}`];
     } else {
         if (pencilMode) {
-            // Notiz Logik
             let key = `${r}-${c}`;
             if (!notes[key]) notes[key] = [];
-            
-            if (notes[key].includes(num)) {
-                notes[key] = notes[key].filter(n => n !== num);
-            } else {
-                notes[key].push(num);
-            }
-            // Wenn man Notizen macht, eigentlichen Wert löschen
+            notes[key] = notes[key].includes(num) ? notes[key].filter(n => n !== num) : [...notes[key], num];
             currentBoard[r][c] = 0; 
         } else {
-            // Zahl setzen
             currentBoard[r][c] = num;
-            // Notizen löschen wenn Zahl gesetzt wird
             delete notes[`${r}-${c}`];
         }
     }
     renderBoard();
     checkWin();
-}
+};
 
-function getHint() {
-    // Suche erstes leeres Feld und fülle es korrekt
+window.getHint = function() {
     for (let r = 0; r < 9; r++) {
         for (let c = 0; c < 9; c++) {
             if (currentBoard[r][c] === 0) {
@@ -106,31 +84,16 @@ function getHint() {
             }
         }
     }
-    alert("Alles schon ausgefüllt!");
-}
+};
 
-function solveGame() {
-    // Kopiere Lösung ins Board
-    for (let r = 0; r < 9; r++) {
-        currentBoard[r] = [...solvedBoard[r]];
-    }
+window.solveGame = function() {
+    currentBoard = JSON.parse(JSON.stringify(solvedBoard));
     renderBoard();
-}
+};
 
 function checkWin() {
-    // Einfacher Check: Ist das Board voll und gleich der Lösung?
-    let isFull = true;
-    let isCorrect = true;
-    for (let r = 0; r < 9; r++) {
-        for (let c = 0; c < 9; c++) {
-            if (currentBoard[r][c] === 0) isFull = false;
-            if (currentBoard[r][c] !== solvedBoard[r][c]) isCorrect = false;
-        }
-    }
-
-    if (isFull && isCorrect) {
-        setTimeout(() => alert("Gewonnen! Super gemacht!"), 100);
-    }
+    const isWin = currentBoard.every((row, r) => row.every((val, c) => val === solvedBoard[r][c]));
+    if (isWin) setTimeout(() => alert("🎉 Sudoku gelöst!"), 200);
 }
 
 function renderBoard() {
@@ -140,116 +103,69 @@ function renderBoard() {
             const val = currentBoard[r][c];
             const isInit = initialBoard[r][c] !== 0;
             
-            // Reset Classes
-            cell.className = 'cell';
-            if (isInit) cell.classList.add('initial');
-            if (selectedCell && selectedCell.r === r && selectedCell.c === c) cell.classList.add('selected');
+            cell.className = 'cell' + (isInit ? ' initial' : '') + 
+                (selectedCell?.r === r && selectedCell?.c === c ? ' selected' : '');
             
-            // Content löschen
             cell.innerHTML = '';
-
             if (val !== 0) {
                 cell.textContent = val;
-                // Highlight gleiche Zahlen
-                if (selectedCell && currentBoard[selectedCell.r][selectedCell.c] === val) {
-                    cell.classList.add('highlighted');
-                }
+                if (selectedCell && currentBoard[selectedCell.r][selectedCell.c] === val) cell.classList.add('highlighted');
             } else {
-                // Notizen anzeigen
                 const cellNotes = notes[`${r}-${c}`];
-                if (cellNotes && cellNotes.length > 0) {
-                    const noteContainer = document.createElement('div');
-                    noteContainer.className = 'note-grid';
+                if (cellNotes?.length) {
+                    const container = document.createElement('div');
+                    container.className = 'note-grid';
                     for (let i = 1; i <= 9; i++) {
-                        let span = document.createElement('span');
-                        span.className = 'note-num';
-                        span.textContent = cellNotes.includes(i) ? i : '';
-                        noteContainer.appendChild(span);
+                        const s = document.createElement('span');
+                        s.className = 'note-num';
+                        s.textContent = cellNotes.includes(i) ? i : '';
+                        container.appendChild(s);
                     }
-                    cell.appendChild(noteContainer);
+                    cell.appendChild(container);
                 }
             }
         }
     }
 }
 
-// --- Sudoku Generator Logik ---
+// Minimaler Sudoku Generator
 function generateGame(difficulty) {
-    // 1. Leeres Board
     let grid = Array(9).fill().map(() => Array(9).fill(0));
-    
-    // 2. Diagonale füllen (Boxen sind unabhängig)
-    fillBox(grid, 0, 0);
-    fillBox(grid, 3, 3);
-    fillBox(grid, 6, 6);
-    
-    // 3. Rest lösen
-    solve(grid);
-    solvedBoard = JSON.parse(JSON.stringify(grid)); // Lösung speichern
-
-    // 4. Löcher machen
-    let attempts = difficulty === 'easy' ? 30 : difficulty === 'medium' ? 40 : 50;
-    while (attempts > 0) {
-        let r = Math.floor(Math.random() * 9);
-        let c = Math.floor(Math.random() * 9);
-        if (grid[r][c] !== 0) {
-            grid[r][c] = 0;
-            attempts--;
+    const solve = (g) => {
+        for (let r = 0; r < 9; r++) {
+            for (let c = 0; c < 9; c++) {
+                if (g[r][c] === 0) {
+                    let nums = [1,2,3,4,5,6,7,8,9].sort(() => Math.random() - 0.5);
+                    for (let n of nums) {
+                        if (isSafe(g, r, c, n)) {
+                            g[r][c] = n;
+                            if (solve(g)) return true;
+                            g[r][c] = 0;
+                        }
+                    }
+                    return false;
+                }
+            }
         }
+        return true;
+    };
+    solve(grid);
+    solvedBoard = JSON.parse(JSON.stringify(grid));
+    let holes = difficulty === 'easy' ? 35 : difficulty === 'medium' ? 48 : 58;
+    while(holes > 0) {
+        let r = Math.floor(Math.random()*9), c = Math.floor(Math.random()*9);
+        if(grid[r][c]!==0) { grid[r][c]=0; holes--; }
     }
-    
     initialBoard = JSON.parse(JSON.stringify(grid));
     currentBoard = JSON.parse(JSON.stringify(grid));
-    notes = {};
-    selectedCell = null;
+    notes = {}; selectedCell = null;
 }
 
-function fillBox(grid, row, col) {
-    let num;
-    for (let i = 0; i < 3; i++) {
-        for (let j = 0; j < 3; j++) {
-            do {
-                num = Math.floor(Math.random() * 9) + 1;
-            } while (!isSafeBox(grid, row, col, num));
-            grid[row + i][col + j] = num;
-        }
-    }
-}
-
-function isSafeBox(grid, rowStart, colStart, num) {
-    for (let i = 0; i < 3; i++) {
-        for (let j = 0; j < 3; j++) {
-            if (grid[rowStart + i][colStart + j] === num) return false;
-        }
-    }
+function isSafe(g, r, c, n) {
+    for(let i=0; i<9; i++) if(g[r][i]===n || g[i][c]===n) return false;
+    let rs=r-r%3, cs=c-c%3;
+    for(let i=0; i<3; i++) for(let j=0; j<3; j++) if(g[rs+i][cs+j]===n) return false;
     return true;
 }
 
-function isSafe(grid, row, col, num) {
-    for (let x = 0; x < 9; x++) if (grid[row][x] === num) return false;
-    for (let x = 0; x < 9; x++) if (grid[x][col] === num) return false;
-    let startRow = row - (row % 3), startCol = col - (col % 3);
-    for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) if (grid[i + startRow][j + startCol] === num) return false;
-    return true;
-}
-
-function solve(grid) {
-    for (let r = 0; r < 9; r++) {
-        for (let c = 0; c < 9; c++) {
-            if (grid[r][c] === 0) {
-                for (let num = 1; num <= 9; num++) {
-                    if (isSafe(grid, r, c, num)) {
-                        grid[r][c] = num;
-                        if (solve(grid)) return true;
-                        grid[r][c] = 0;
-                    }
-                }
-                return false;
-            }
-        }
-    }
-    return true;
-}
-
-// Start Grid Struktur beim Laden
-initGrid();
+document.addEventListener('DOMContentLoaded', initGrid);
